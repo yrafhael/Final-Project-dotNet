@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace Final_project.Model
 {
@@ -29,9 +31,11 @@ namespace Final_project.Model
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-            }
+             var configuration =  new ConfigurationBuilder()
+            .AddJsonFile($"appsettings.json");
+
+        var config = configuration.Build();
+        optionsBuilder.UseSqlServer(@config["Northwind:ConnectionString"]);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
