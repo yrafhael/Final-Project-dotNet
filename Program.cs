@@ -1,6 +1,7 @@
 ﻿using NLog;
 using Final_project.Model;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 // See https://aka.ms/new-console-template for more information
 string path = Directory.GetCurrentDirectory() + "\\nlog.config";
@@ -46,6 +47,9 @@ try
                 break;
             case "3":
                 EditCategory(db, logger);
+                break;
+            case "4":
+                DisplayCategoryAndActiveProducts(db, logger);
                 break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
@@ -147,5 +151,27 @@ static void EditCategory(NWContext db, Logger logger)
     {
         Console.WriteLine("Category not found");
         logger.Warn($"Category with ID {id} not found");
+    }
+}
+
+static void DisplayCategoryAndActiveProducts(NWContext db, Logger logger)
+{
+    var query = db.Categories.OrderBy(p => p.CategoryId);
+
+    Console.WriteLine("Select the category whose active products you want to display:");
+    Console.ForegroundColor = ConsoleColor.DarkRed;
+    foreach (var item in query)
+    {
+        Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
+    }
+    Console.ForegroundColor = ConsoleColor.White;
+    int id = int.Parse(Console.ReadLine());
+    Console.Clear();
+    logger.Info($"CategoryId {id} selected");
+    Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id);
+    Console.WriteLine($"{category.CategoryName} - {category.Description}");
+    foreach (Product p in category.Products.Where(p => !p.Discontinued))
+    {
+        Console.WriteLine($"\t{p.ProductName}");
     }
 }
