@@ -60,6 +60,9 @@ try
             case "7":
                 EditProduct(db, logger);
                 break;
+            case "8":
+                DisplayAllProducts(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -259,4 +262,40 @@ static void EditProduct(NWContext db, Logger logger)
         Console.WriteLine("Product not found");
         logger.Warn($"Product with ID {id} not found");
     }
+}
+
+static void DisplayAllProducts(NWContext db, Logger logger)
+{
+    Console.WriteLine("Do you want to see:");
+    Console.WriteLine("A. All products");
+    Console.WriteLine("B. Discontinued products");
+    Console.WriteLine("C. Continued products/Active");
+    string choice = Console.ReadLine().ToUpper();
+    IQueryable<Product> query;
+
+    switch (choice)
+    {
+        case "A":
+            query = db.Products.OrderBy(p => p.ProductName);
+            break;
+        case "B":
+            query = db.Products.Where(p => p.Discontinued).OrderBy(p => p.ProductName);
+            break;
+        case "C":
+            query = db.Products.Where(p => !p.Discontinued).OrderBy(p => p.ProductName);
+            break;
+        default:
+            Console.WriteLine("Invalid choice");
+            logger.Warn($"Invalid choice {choice} entered");
+            return;
+    }
+
+    Console.ForegroundColor = ConsoleColor.DarkCyan;
+    Console.WriteLine($"{query.Count()} records returned");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    foreach (var item in query)
+    {
+        Console.WriteLine($"{item.ProductName} - {(item.Discontinued ? "Discontinued" : "Active")}");
+    }
+    Console.ForegroundColor = ConsoleColor.White;
 }
