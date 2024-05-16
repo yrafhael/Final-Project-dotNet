@@ -63,6 +63,9 @@ try
             case "8":
                 DisplayAllProducts(db, logger);
                 break;
+            case "9":
+                DisplaySpecificProduct(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -298,4 +301,29 @@ static void DisplayAllProducts(NWContext db, Logger logger)
         Console.WriteLine($"{item.ProductName} - {(item.Discontinued ? "Discontinued" : "Active")}");
     }
     Console.ForegroundColor = ConsoleColor.White;
+}
+
+static void DisplaySpecificProduct(NWContext db, Logger logger)
+{
+    Console.WriteLine("Enter the Product ID to display:");
+    int id = int.Parse(Console.ReadLine());
+    var product = db.Products.Find(id);
+    if (product != null)
+    {
+        Console.WriteLine($"Product ID: {product.ProductId}");
+        Console.WriteLine($"Product Name: {product.ProductName}");
+        Console.WriteLine($"Supplier ID: {product.SupplierId}");
+        Console.WriteLine($"Category ID: {product.CategoryId}");
+        Console.WriteLine($"Quantity Per Unit: {product.QuantityPerUnit}");
+        Console.WriteLine($"Unit Price: {product.UnitPrice}");
+        Console.WriteLine($"Units In Stock: {product.UnitsInStock}");
+        Console.WriteLine($"Units On Order: {product.UnitsOnOrder}");
+        Console.WriteLine($"Reorder Level: {product.ReorderLevel}");
+        Console.WriteLine($"Discontinued: {(product.Discontinued ? "Yes" : "No")}");
+    }
+    else
+    {
+        Console.WriteLine("Product not found");
+        logger.Warn($"Product with ID {id} not found");
+    }
 }
