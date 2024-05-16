@@ -38,7 +38,7 @@ try
         switch (choice)
         {
             case "1":
-                // method for display category
+                DisplayCategories(db, logger);
                 break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
@@ -56,3 +56,16 @@ catch (Exception ex)
 
 logger.Info("Program ended");
 
+static void DisplayCategories(NWContext db, Logger logger)
+{
+    var query = db.Categories.OrderBy(p => p.CategoryName);
+
+    Console.ForegroundColor = ConsoleColor.DarkCyan;
+    Console.WriteLine($"{query.Count()} records returned");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    foreach (var item in query)
+    {
+        Console.WriteLine($"{item.CategoryName} - {item.Description}");
+    }
+    Console.ForegroundColor = ConsoleColor.White;
+}
