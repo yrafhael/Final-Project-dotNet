@@ -1,5 +1,6 @@
 ﻿using NLog;
 using Final_project.Model;
+using System.ComponentModel.DataAnnotations;
 
 // See https://aka.ms/new-console-template for more information
 string path = Directory.GetCurrentDirectory() + "\\nlog.config";
@@ -40,6 +41,9 @@ try
             case "1":
                 DisplayCategories(db, logger);
                 break;
+            case "2":
+                AddCategory(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -68,4 +72,41 @@ static void DisplayCategories(NWContext db, Logger logger)
         Console.WriteLine($"{item.CategoryName} - {item.Description}");
     }
     Console.ForegroundColor = ConsoleColor.White;
+}
+
+static void AddCategory(NWContext db, Logger logger)
+{
+    Category category = new Category();
+    Console.WriteLine("Enter Category Name:");
+    category.CategoryName = Console.ReadLine();
+    Console.WriteLine("Enter the Category Description:");
+    category.Description = Console.ReadLine();
+    ValidationContext context = new ValidationContext(category, null, null);
+    List<ValidationResult> results = new List<ValidationResult>();
+
+    var isValid = Validator.TryValidateObject(category, context, results, true);
+    if (isValid)
+    {
+        // check for unique name
+        if (db.Categories.Any(c => c.CategoryName == category.CategoryName))
+        {
+            // generate validation error
+            isValid = false;
+            results.Add(new ValidationResult("Name exists", new string[] { "CategoryName" }));
+        }
+        else
+        {
+            logger.Info("Validation passed");
+            db.Categories.Add(category);
+            db.SaveChanges();
+            logger.Info("Category added to database");
+        }
+    }
+    if (!isValid)
+    {
+        foreach (var result in results)
+        {
+            logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+        }
+    }
 }
