@@ -69,6 +69,9 @@ try
             case "10":
                 DeleteProduct(db, logger);
                 break;
+            case "11":
+                DeleteCategory(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -346,5 +349,23 @@ static void DeleteProduct(NWContext db, Logger logger)
     {
         Console.WriteLine("Product not found");
         logger.Warn($"Product with ID {id} not found");
+    }
+}
+
+static void DeleteCategory(NWContext db, Logger logger)
+{
+    Console.WriteLine("Enter the Category ID to delete:");
+    int id = int.Parse(Console.ReadLine());
+    var category = db.Categories.Find(id);
+    if (category != null)
+    {
+        db.Categories.Remove(category);
+        db.SaveChanges();
+        logger.Info($"Category with ID {id} deleted");
+    }
+    else
+    {
+        Console.WriteLine("Category not found");
+        logger.Warn($"Category with ID {id} not found");
     }
 }
