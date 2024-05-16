@@ -57,6 +57,9 @@ try
             case "6":
                 AddProduct(db, logger);
                 break;
+            case "7":
+                EditProduct(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -220,4 +223,40 @@ static void AddProduct(NWContext db, Logger logger)
     db.Products.Add(product);
     db.SaveChanges();
     logger.Info("Product added to database");
+}
+
+static void EditProduct(NWContext db, Logger logger)
+{
+    Console.WriteLine("Enter the Product ID to edit:");
+    int id = int.Parse(Console.ReadLine());
+    var product = db.Products.Find(id);
+    if (product != null)
+    {
+        Console.WriteLine("Enter Product Name:");
+        product.ProductName = Console.ReadLine();
+        Console.WriteLine("Enter the Supplier ID:");
+        product.SupplierId = int.Parse(Console.ReadLine());
+        Console.WriteLine("Enter the Category ID:");
+        product.CategoryId = int.Parse(Console.ReadLine());
+        Console.WriteLine("Enter the Quantity Per Unit:");
+        product.QuantityPerUnit = Console.ReadLine();
+        Console.WriteLine("Enter the Unit Price:");
+        product.UnitPrice = decimal.Parse(Console.ReadLine());
+        Console.WriteLine("Enter the Units In Stock:");
+        product.UnitsInStock = short.Parse(Console.ReadLine());
+        Console.WriteLine("Enter the Units On Order:");
+        product.UnitsOnOrder = short.Parse(Console.ReadLine());
+        Console.WriteLine("Enter the Reorder Level:");
+        product.ReorderLevel = short.Parse(Console.ReadLine());
+        Console.WriteLine("Is the product discontinued? (true/false):");
+        product.Discontinued = bool.Parse(Console.ReadLine());
+
+        db.SaveChanges();
+        logger.Info($"Product with ID {id} updated");
+    }
+    else
+    {
+        Console.WriteLine("Product not found");
+        logger.Warn($"Product with ID {id} not found");
+    }
 }
