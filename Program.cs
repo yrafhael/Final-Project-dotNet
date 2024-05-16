@@ -51,6 +51,9 @@ try
             case "4":
                 DisplayCategoryAndActiveProducts(db, logger);
                 break;
+            case "5":
+                DisplayAllCategoriesAndActiveProducts(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -173,5 +176,18 @@ static void DisplayCategoryAndActiveProducts(NWContext db, Logger logger)
     foreach (Product p in category.Products.Where(p => !p.Discontinued))
     {
         Console.WriteLine($"\t{p.ProductName}");
+    }
+}
+
+static void DisplayAllCategoriesAndActiveProducts(NWContext db, Logger logger)
+{
+    var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
+    foreach (var item in query)
+    {
+        Console.WriteLine($"{item.CategoryName}");
+        foreach (Product p in item.Products.Where(p => !p.Discontinued))
+        {
+            Console.WriteLine($"\t{p.ProductName}");
+        }
     }
 }
