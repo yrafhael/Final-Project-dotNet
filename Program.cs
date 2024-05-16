@@ -44,6 +44,9 @@ try
             case "2":
                 AddCategory(db, logger);
                 break;
+            case "3":
+                EditCategory(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -108,5 +111,41 @@ static void AddCategory(NWContext db, Logger logger)
         {
             logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
         }
+    }
+}
+
+static void EditCategory(NWContext db, Logger logger)
+{
+    Console.WriteLine("Enter the Category ID to edit:");
+    int id = int.Parse(Console.ReadLine());
+    var category = db.Categories.Find(id);
+    if (category != null)
+    {
+        Console.WriteLine("Enter Category Name:");
+        category.CategoryName = Console.ReadLine();
+        Console.WriteLine("Enter the Category Description:");
+        category.Description = Console.ReadLine();
+
+        ValidationContext context = new ValidationContext(category, null, null);
+        List<ValidationResult> results = new List<ValidationResult>();
+
+        var isValid = Validator.TryValidateObject(category, context, results, true);
+        if (isValid)
+        {
+            db.SaveChanges();
+            logger.Info($"Category with ID {id} updated");
+        }
+        else
+        {
+            foreach (var result in results)
+            {
+                logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+            }
+        }
+    }
+    else
+    {
+        Console.WriteLine("Category not found");
+        logger.Warn($"Category with ID {id} not found");
     }
 }
