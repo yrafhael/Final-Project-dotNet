@@ -66,6 +66,9 @@ try
             case "9":
                 DisplaySpecificProduct(db, logger);
                 break;
+            case "10":
+                DeleteProduct(db, logger);
+                break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 logger.Warn($"Invalid option {choice} selected");
@@ -320,6 +323,24 @@ static void DisplaySpecificProduct(NWContext db, Logger logger)
         Console.WriteLine($"Units On Order: {product.UnitsOnOrder}");
         Console.WriteLine($"Reorder Level: {product.ReorderLevel}");
         Console.WriteLine($"Discontinued: {(product.Discontinued ? "Yes" : "No")}");
+    }
+    else
+    {
+        Console.WriteLine("Product not found");
+        logger.Warn($"Product with ID {id} not found");
+    }
+}
+
+static void DeleteProduct(NWContext db, Logger logger)
+{
+    Console.WriteLine("Enter the Product ID to delete:");
+    int id = int.Parse(Console.ReadLine());
+    var product = db.Products.Find(id);
+    if (product != null)
+    {
+        db.Products.Remove(product);
+        db.SaveChanges();
+        logger.Info($"Product with ID {id} deleted");
     }
     else
     {
